@@ -1,0 +1,39 @@
+In parallel programming, a barrier is a type of synchronization method. For a group of threads or processors,
+a barrier signifies a point at which all the threads or processors must arrive at and wait for the rest, before it
+can cross it and continue execution.
+There are several barrier algorithm that can be implemented when programming in parallel.
+
+Giving below are some of the barriers that I implemented as part of this assignment:
+1) Sense-reversing centralized barrier
+In the sense-reversing centralized barrier, every thread spin on a global "sense" flag.
+the global "count" variable holds the number of threads. The global sense flag is initially 
+set to 0 to indicate that the barrier hasn't been reached. when a thread reaches the barrier. 
+The last thread to reach the barrier decrements count and realized that the count is 0. 
+It also set the global "sense" flag which indicate to other threads spinning that all threads have 
+reached the barrier. All threads stop spinning and continue execution.
+
+Benefits: 
+- reduce number of references to shared variables
+- Eliminate once of the spinning episodes.
+
+2) MCS Barrier 
+MCS tree barrier is also a tree barrier. It's a modified tree barrier.
+Each processor begins at a leaf node, decrements it leaf count variable.
+Last descendant to reach each node in the tree continues upward. 
+The processor that reaches the root begin wakeup.
+
+Benefits: 
+- Can significantly decrease memory contention.
+- Can prevent tree saturation in multi-stage interconnect.
+
+
+* OpenMP (Open Multi-Processing) is an API that supports multi-platform shared memory multiprocessing programming in C, C++, and Fortran.
+OpenMP uses a portable, scalable model that gives programmers a simple and flexible interface for developing parallel 
+applications for platforms ranging from the standard desktop computer to the supercomputer.
+
+* OpenMP Barrier were tested on a quad-core Linux Ubuntu 14.04. 
+I scaled the number of thread from 2– 8 while keeping the number of barriers 1000 and averaging the
+time for each barrier. 
+The performance Sense-reversing centralized barrier seems to be better than MCS barrier.
+A point (N,T) on the graph signifies the average time T taken by the number of thread N to cross 1000 barrier and complete execution.
+

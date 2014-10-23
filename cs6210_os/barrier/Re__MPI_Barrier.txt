@@ -1,0 +1,27 @@
+1) Dissemination Barrier
+	In dissemination barrier, each processor signals the processor (i+2^k)mod P in round k.
+I only need k = ceil(logP) number of rounds to synchronize all processes. Each processor has
+localflags, a pointer to the structure which holds its own flag as well as a pointer to the partner
+processor’s flag. Each processor spins on its local myflags. When a processor reaches the
+barrier, it informs its partner processor by setting its flag through the pointer partnerflags.
+
+2) Tournament Barrier
+ The tournament barrier is a binary tree-style barrier where all the processor are initial assigned as leaf node.
+ A pair of consecutive processor will "play" each other in a tournament with one emerging victorious and proceeding to the
+next round of a tournament, while the loser will spin on it flags. An important point to note here is that the winners at each round are
+pre-determined. This process repeat for every round until you reach the final level where only one processor is declared the champion.
+Now, the wake up process begin where the winners at each stage need to wake up their respective opponents.
+This essentially involves the winner flipping the flag value of its opponents so as to prevent it from spinning infinitely on that value.
+ 
+In the Open MPI, there is no concept of ‘shared data’.
+Data is passed around by Message Passing. Blocking Send/ Receive signals are used to achieve the barrier. 
+The losers spin / wait on a “send” from the winners in the wake up phase. 
+While the winners wait and receive until the losers come about telling them about their arrival. In the
+wake up phase the winners just send to the corresponding opponent losers in that round to
+break out of the spinning / waiting phase.
+
+
+* MPI Barrier were tested over 2 to 12 quad-core notes in the Unubutu 14.04 desktop.
+The number of processes was scaled from 2 to 12. 
+The performance Dissemination barrier seems to be better than Tournament barrier.
+A point (N,T) on the graph signifies the average time T taken by the number of thread N to cross 1000 barrier and complete execution.
