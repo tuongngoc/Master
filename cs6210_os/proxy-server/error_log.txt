@@ -1,0 +1,92 @@
+Error detected: 
+ 
+<gtcache_init(). with -capacity:1024, entry_size: 1, num_levels:8192
+ 
+===> **max_entries: <1024 > 
+ 
+#gtcach_init() successful
+ 
++SET key:http://163.com , val_size: 1024
+ 
++SET Max_size:1024 , used: 0 , need: 1024
+ 
++SET AMY--data_len: 1024 
+ 
+ ++++pop- Id: 0  
+ 
++gtcache_set() add entry--<id:0> , key: http://163.com
+ 
+--> current cache size used: 1024 <--
+ 
++SET key:http://4shared.com , val_size: 1024
+ 
++SET Max_size:1024 , used: 1024 , need: 1024
+ 
++SET AMY--data_len: 1024 
+ 
+--Evict--REPALCE-- 
+*REPLACE -size_need : 1024, used: 1024  
+-EVICT [id= 0] - removing key:http://163.com data_size:1024
+Error: index 0 is not in the indexrndq structure.
+This error occurred in a program that tests that gtcache_get returns the correct content.
+Error detected: 
+ 
+<gtcache_init(). with -capacity:2048, entry_size: 1024, num_levels:1
+ 
+===> **max_entries: <2 > 
+ 
+#gtcach_init() successful
+ 
++SET key:http://163.com , val_size: 1024
+ 
++SET Max_size:2048 , used: 0 , need: 1024
+ 
++SET AMY--data_len: 1024 
+ 
+ ++++pop- Id: 0  
+ 
++gtcache_set() add entry--<id:0> , key: http://163.com
+ 
+--> current cache size used: 1024 <--
+ 
++SET key:http://4shared.com , val_size: 1024
+ 
++SET Max_size:2048 , used: 1024 , need: 1024
+ 
++SET AMY--data_len: 1024 
+ 
+ ++++pop- Id: 1  
+ 
++gtcache_set() add entry--<id:1> , key: http://4shared.com
+ 
+--> current cache size used: 2048 <--
+ 
++SET key:http://about.com , val_size: 1024
+ 
++SET Max_size:2048 , used: 2048 , need: 1024
+ 
++SET AMY--data_len: 1024 
+ 
+--Evict--REPALCE-- 
+*REPLACE -size_need : 1024, used: 2048  
+-EVICT [id= 1] - removing key:http://4shared.com data_size:1024
+Error: index 1 is not in the indexrndq structure.
+This error occurred in a program that tests that replacement occurs as expected.
+Error detected: 
+ 
+<gtcache_init(). with -capacity:1024, entry_size: 13, num_levels:1141090
+ 
+===> **max_entries: <78 > 
+ 
+#gtcach_init() successful
+ 
++SET key:http://163.com , val_size: 570545
+ 
++SET Max_size:1024 , used: 0 , need: 570545
+ 
++SET AMY--data_len: 570545 
+ 
+--Evict--REPALCE-- 
+*REPLACE -size_need : 570545, used: 0 Error: indexrndq underflow
+
+This error occurred in a program that tests that gtcache evicts many small old entries to make space of a larger new one.
