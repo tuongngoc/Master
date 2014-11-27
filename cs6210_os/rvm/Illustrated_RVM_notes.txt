@@ -1,0 +1,124 @@
+*rvm_about_to_modify() 
+---------------------
+modifies each of the mapped segments. Note that the API allows us to modify portions of each segment by providing offset and size. 
+     Segment Memory
+    +--------------------------+
+    |<-------- size ---------->|
+    +--------------------------+
+            ^           ^
+            |<--------->|
+            |    len
+            offset		
+			
+Illustrated rvm.h:
+------------------
+E.g.: An update to Segment memory happens from "AA" to "BB" to "CC". Update1 will record "AA" in undo and new change "BB" is put in Segment memory (shown below). Similarly, Update2 will record "BB" in undo and new change "CC" is put in Segment memory (NOT shown below). 
+
+_rvm_t
++---------+
+| prefix[]|-> "rvm_segments"
+| redofd  |
+| segst   |-> seg1 -> seg2-> 0
++---------+
+
+trans_t (in memory, for each transaction)
++-----------+
+| rvm       |
+| numsegs   |     array
+| segments[]|--->+-----------+    _segment_t
++-----------+    | _segment_t|<==>+----------+    Segment memory
+                 | _segment_t|    | segname[]|    |<--- size ----->
+                 | ...       |    | segbase  |--->+----------------+
+                 | _segment_t|    | size     |    |     |BB|       |
+                 +-----------+    | cur_trans|    +----------------+
+                                  | mods     |-> Update1 -> Update2 -> 0
+                                  +----------+      |
+                                                    | mod_t
+                                                 +--------+
+                                                 | offset |
+                                                 | size   |
+                                                 | undo   |-> +--+
+                                                 +--------+   |AA|
+                                                              +--+
+_redo_t (on disk, for each redo entry that corresponds to each trans_t)
++-----------+
+| numentries|     array     
+| entries[] |--->+-----------+    segentry_t
++-----------+    | segentry_t|<==>+-----------+
+                 | segentry_t|    | segname[] |
+                 | ...       |    | segsize   |
+                 | segentry_t|    | updatesize| (packed total updatesize)
+                 +-----------+    | numupdates| (= 2 as an example)
+                  +---------------| offsets   |
+                  |            +--| sizes     |
+                  |            |  | data      |--+
+                  |            |  +-----------+  |
+                  V            V                 V
+              +--------+   +------+           +------+
+              | offset1|   | size1|           | data1|
+              | offset2|   | size2|           | data2|
+              +--------+   +------+           +------+
+
+
+_redo_t (on disk, for each redo entry that corresponds to each trans_t)
++-----------+
+| numentries|     array     
+| entries[] |--->+-----------+    segentry_t
++-----------+    | segentry_t|<==>+-----------+
+                 | segentry_t|    | segname[] | = "segmentA"
+                 | ...       |    | segsize   | = 100
+                 | segentry_t|    | updatesize| (total of data blocks = 2+5+4=11)
+                 +-----------+    | numupdates| (= 3 as an example)
+                  +---------------| offsets   |
+                  |            +--| sizes     |
+                  |            |  | data      |--+
+                  |            |  +-----------+  |
+                  V            V                 V
+              +--------+   +------+           +------+
+              |      10|   |     2|           |    AA|
+              |      35|   |     5|           | BBBBB|
+              |      15|   |     4|           |   CCC|
+              +--------+   +------+           +------+
+			  
+
+
+*I have used "data" of segentry_t to be a serialized list of data blocks that were modified by a transaction. 
+ It is important to note that this is variable-length list of data blocks. 
+ You could implement this differently to use only fixed-length list for simplicity in this assignment if you want 
+ -- this will waste some space in redo logs, but it should be fine for this assignment.	
+
+For the variable-length implementation, let's take an example to understand this.  
+Say, a transaction has the following modifications: "AA", "BBBBB", and "CCC" at offsets, say, 10, 35, 15
+So the redo_t will look like:
+
+_redo_t (on disk, for each redo entry that corresponds to each trans_t)
++-----------+
+| numentries|     array     
+| entries[] |--->+-----------+    segentry_t
++-----------+    | segentry_t|<==>+-----------+
+                 | segentry_t|    | segname[] | = "segmentA"
+                 | ...       |    | segsize   | = 100
+                 | segentry_t|    | updatesize| (total of data blocks = 2+5+4=11)
+                 +-----------+    | numupdates| (= 3 as an example)
+                  +---------------| offsets   |
+                  |            +--| sizes     |
+                  |            |  | data      |--+
+                  |            |  +-----------+  |
+                  V            V                 V
+              +--------+   +------+           +------+
+              |      10|   |     2|           |    AA|
+              |      35|   |     5|           | BBBBB|
+              |      15|   |     4|           |   CCC|
+              +--------+   +------+           +------+
+
+You could do some memory allocation optimizations by using updatesize appropriately during apply_redo(),
+but I just allocate and free memory for each data block as required to keep an upper bound on the complexity for this assignment.
+
+The above struct will be stored as following on disk: 
+(white spaces shown only for illustration purposes, they will not be present actually)
+segmentA     100  11 3   10 35 15   2 5 4    AA BBBBB CCC
+
+When the file is stored on disk, you can use the command "hd redofile" to view and verify the contents of the file in hex and ASCII. 
+"hd" stands for hex dump. When you read the redofile during log truncation as part of rvm_map(), 
+you will need to reconstruct the struct from this data on disk and apply the data to the segment file.
+			  	  
