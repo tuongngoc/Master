@@ -54,10 +54,6 @@ void proc2()
      segs[0] = (char*) rvm_map(rvm, SEGNAME0, 1000);
      segs[1] = (char*) rvm_map(rvm, SEGNAME1, 1000);
 
- printf("AMY in segment 0 (%s)\n", segs[0]+OFFSET0);
- 
- printf("AMY in segment 1 (%s)\n", segs[1]+OFFSET1);
-
      if(strcmp(segs[0] + OFFSET0, STRING0)) {
        printf("ERROR in segment 0 (%s)\n", segs[0]+OFFSET0);
        exit(2);

@@ -1,5 +1,3 @@
-#include"rvm.h"
-#include "rvm.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -9,6 +7,9 @@
 #include <unistd.h>
 #include <sys/mman.h>
 #include <errno.h>
+
+#include "rvm.h"
+
 
 #define DEBUG
 
@@ -35,10 +36,6 @@ char redo_file_path[512];
 static int num_undo_records = 0;
 static steque_t *stack_mods;
 
-/* segements mapped queue*/
-static steque_t *mapped;
-
-
 
 /*utility wire redo log*/
 void write_redolog_to_file(int trans_id);
@@ -64,33 +61,15 @@ lock.l_len = 0;
 return fcntl(fd,F_SETLKW,&lock);
 }
 
-void print_transactions( trans_t trans)
-{
-  int i;
-  int size;
-  mod_t* pmod;
-  GTPRT("============TRANS OUTPUT==========\n");
-  for (i = 0; i < trans->numsegs; ++i){  
-    GTPRT("=> At index = %d \n", i )
-      GTPRT("=> segname: %s\n",trans->segments[i]->segname);
-    GTPRT("=> size: %d\n", trans->segments[i]->size);
-    GTPRT("=> segname: %s\n", (char*)trans->segments[i]->segbase);
-
-    size = steque_size(stack_mods);
-    GTPRT("--------Read mod_t ARRAYS size: %d-------\n", size);
-    int idx = 0;
-    while (steque_size(&trans->segments[i]->mods) > 0 ) {
-      GTPRT("--------mod_t index: %d\n", i);
-      pmod = (mod_t *) steque_pop(stack_mods);
-      if (pmod != NULL) {
-        GTPRT("-mod_t[%d]-offset: %d\n", idx,pmod->offset);
-        GTPRT("-mod_t[%d] -size: %d\n", idx,pmod->size);
-        GTPRT("-mod_t[%d]-undo: %s\n", idx,(char*)pmod->undo);
-      }
-      idx++;
-    }
-    GTPRT("-----------------------------\n");	
+seqsrchst_value find_seg_data(seqsrchst_t* st, char *segnamep) {
+  seqsrchst_node* node;
+  for( node = st->first; node != NULL; node = node->next) {
+    segment_t segment = (segment_t)node->value;
+    if(strcmp(segment->segname,segnamep) == 0)
+      return node->value;
   }
+
+  return NULL;
 }
 
 int keycmpfunc(seqsrchst_key a, seqsrchst_key b) 
@@ -119,9 +98,7 @@ rvm_t rvm_init(const char *directory){
   // Allocate the redo log
   redo_log = malloc(sizeof(struct _redo_t));
   redo_log->numentries = 0;
-  /*++Todo: find the size to allocated instead fixed value*/
-  redo_log->entries = malloc(sizeof(segentry_t) * MAX_SEGMENTS);
-
+ 
   // Need to build the redo file path
   strcpy(redo_file_path, new_rvm_t->prefix);
   strcat(redo_file_path, "/");
@@ -143,13 +120,6 @@ rvm_t rvm_init(const char *directory){
   }   
   steque_init(stack_mods);
 
-   /* build the stack segements mapped */
-  mapped= malloc (sizeof(steque_t));
-  if (mapped == NULL) {
-    GTFATAL_ERROR("<rvm_init> *ERROR allocate memory for mapped \n");
-  }   
-  steque_init(mapped);
-
   // Close the file as we don't need it right now
   close(logfd);
   //GTDBG("--*END-<rvm_init>---\n\n");
@@ -167,11 +137,20 @@ void *rvm_map(rvm_t rvm, const char *segname, int size_to_create){
   int size_diff = 0;
   int seg_file;
   int result;
+  segment_t seg;
 
   char seg_file_path[512];
   strcpy(seg_file_path, rvm->prefix);
   strcat(seg_file_path, "/");
   strcat(seg_file_path, segname);
+
+  seg = (segment_t)find_seg_data(&rvm->segst,(char*)segname);
+  
+  if (seg != NULL) {
+    GTPRT("\n The same segment :<%s > not allow to map twice!! \n",seg->segname);
+    //tried to map same segment twice in one process
+    return NULL;
+  }
 
   /*
     When a process maps to an existing segment, there may be some updates present in the Redofile, 
@@ -205,7 +184,6 @@ void *rvm_map(rvm_t rvm, const char *segname, int size_to_create){
   }
 
   // Now that we have a blank file, we need to create a segment struct to represent it
-  segment_t seg;
   seg = malloc(sizeof(struct _segment_t));
   // Now the area of memory that is going to map to what is on disk
   seg->segbase = malloc(size_to_create);
@@ -215,10 +193,7 @@ void *rvm_map(rvm_t rvm, const char *segname, int size_to_create){
   result = pread(seg_file, seg->segbase, size_to_create, 0);
   GTDBG("----<rvm_map> -<*segname: %s >READ result : %d---\n",seg->segname,  result);  
   seqsrchst_put(&rvm->segst, seg->segbase, seg);
-  
-  GTDBG("----<rvm_map> -Add segname %s to QUEUE \n", segname);  
-  steque_enqueue(mapped, seg);
-  
+    
   close(seg_file);
   GTDBG("*END-<rvm_map> -\n");
   return seg->segbase;
@@ -266,19 +241,19 @@ void rvm_destroy(rvm_t rvm, const char *segname){
   new_transaction->numsegs = numsegs;
   /* hold arrays of segments*/
   new_transaction->segments = malloc(sizeof(segment_t) * numsegs); 
-  segment_t *segs = new_transaction->segments;
-
-  GTDBG("-<rvm_begin_trans>--seqsrchst_size=%d  --\n", seqsrchst_size(&rvm->segst));
-
+    
     for (i = 0; i < numsegs; i++) {
-    if (segbases[i] == NULL) continue;
-      segs[i] =  (segment_t) seqsrchst_get(&rvm->segst, segbases[i]);
-      if (segs[i]->cur_trans != NULL) {
+      void *pseg = (void *) segbases[i];
+       if (pseg == NULL) continue;
+       segment_t segment =  (segment_t) seqsrchst_get(&rvm->segst, pseg);
+       if (segment->cur_trans != NULL) {
         GTDBG("@<rvm_begin_trans> **Fail and return (trans_t) -1.@@\n\n");
         return (trans_t) -1;
       }
-      segs[i]->cur_trans = new_transaction;
+      segment->cur_trans = new_transaction;
+      new_transaction->segments[i] = segment;
     }
+    
 
   GTDBG("*END--<rvm_begin_trans>-.. \n\n");
   return new_transaction;
@@ -305,7 +280,12 @@ void rvm_about_to_modify(trans_t tid, void *segbase, int offset, int size){
   /* Create a new redo_log put it in. */
   p_seg = (segment_t) seqsrchst_get(&tid->rvm->segst, segbase);
   if (p_seg == NULL) {
-    GTDBG("<rvm_about_to_modify> ##ERROR found modify trans not add yet!! \n" );
+    GTPRT("<rvm_about_to_modify> ##ERROR found modify trans not add yet!! \n" );
+    return;
+  }
+
+  if (p_seg->cur_trans != tid) {
+    GTPRT("<rvm_about_to_modify> ##ERROR Not match tid *** \n" );
     return;
   }
   GTDBG("-<rvm_about_to_modify>- creating mod_t trans \n");
@@ -329,10 +309,33 @@ commit all changes that have been made within the specified transaction. When th
 */
 void rvm_commit_trans(trans_t tid){
   int i;
+  //segment_t segment;
+  //char seg_file_path[512];
+  
   GTDBG("*ENTER---<rvm_commit_trans>  \n");
   //reset the undo record count
   num_undo_records = 0; 
-  
+  /*allocate entries for redo_log*/
+  redo_log->entries = malloc(sizeof(segentry_t) * tid->numsegs);
+
+  #if 0
+  for (i = 0; i < tid->numsegs; i++) {
+    segment = tid->segments[i];
+    strcpy(seg_file_path, tid->rvm->prefix);
+    strcat(seg_file_path, "/");
+    strcat(seg_file_path, segment->segname);
+
+    int fd_seg = open(seg_file_path, (O_RDWR | O_CREAT | O_SYNC), S_IRUSR | S_IWUSR | S_IXUSR);
+    if (fd_seg == -1) {
+      GTPRT("\n*<ERROR>rvm_commit_trans() Failed to  open seg_file \n");
+    }
+    else {
+    
+    }
+  }
+  #endif
+
+
   // This loop iterates through each segment in a transaction and applies the changes
   for (i = 0; i < tid->numsegs; i++) {
     GTDBG("-<rvm_commit_trans> -->@ i=%d  parsing segment %s of transaction\n", i, tid->segments[i]->segname);
