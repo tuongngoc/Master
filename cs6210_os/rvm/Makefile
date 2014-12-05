@@ -26,6 +26,13 @@ abort_test: testcases/abort.o seqsrchst.o steque.o rvm.o
 crash_test: testcases/crash.o seqsrchst.o steque.o rvm.o
 	$(CC) -o crash_test seqsrchst.o steque.o rvm.o testcases/crash.o
 
+prelim_test: testcases/prelim.o seqsrchst.o steque.o rvm.o
+	$(CC) -o prelim_test seqsrchst.o steque.o rvm.o testcases/prelim.o
+
+allbad_test: testcases/doeverythingwrong.o seqsrchst.o steque.o rvm.o
+	$(CC) -o allbad_test seqsrchst.o steque.o rvm.o testcases/doeverythingwrong.o
+	
+
 test: rvm_main basic_test multi_test multi_abort_test truncate_test
 	./rvm_main 
 	./basic_test 

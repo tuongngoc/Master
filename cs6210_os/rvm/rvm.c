@@ -31,9 +31,14 @@ struct flock lock;
 
 void write_redolog_to_file(struct segentry_t* segentry);
 
-
-int keycmpfunc(seqsrchst_key a, seqsrchst_key b) {
-  return a == b;
+int keycmpfunc(seqsrchst_key a, seqsrchst_key b) 
+{
+  if (a == b) {
+    return 1;
+  } 
+  else {
+    return 0;
+   }
 }
 
 /* Place a write lock on the file. */
@@ -375,7 +380,7 @@ void rvm_commit_trans(trans_t tid){
       close(fd);
       segment->cur_trans = NULL;
       write_redolog_to_file(&redo_log->entries[i]);
-    }			
+    }
   }
 
 }
