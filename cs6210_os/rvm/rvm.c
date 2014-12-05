@@ -501,7 +501,7 @@ void write_redolog_to_file(struct segentry_t* segentry) {
   offset = lseek(fd_redo, 0, SEEK_END);
   GTDBG("-<write_redolog_to_file>@@-->[Offset = %d ]\n", offset);
   result = pwrite(fd_redo, segentry->segname, strlen(segentry->segname), offset);
-  offset += 128;
+  offset += sizeof(segentry->segname);  
   if (result == -1) {
     perror("pwrite()");
     exit(1);

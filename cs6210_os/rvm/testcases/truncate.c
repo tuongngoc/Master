@@ -1,7 +1,7 @@
 /* truncate the log; manually inspect to see that the log has shrunk
  * to nothing */
 
-#include "rvm.h"
+#include "../rvm.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
