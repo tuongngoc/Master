@@ -28,7 +28,7 @@ Spring Operating System
 - Spring built kernel components using OO Technology.
 - Spring came out as Sun Solaris' MC product. See [Khalidi's paper](https://www.usenix.org/legacy/publications/library/proceedings/sd96/full_papers/khalidi.ps)
 
-- Spring Approach
+
 ![Spring system](ss/L06A-02.png)
 
 - Nucleus - "Micro Kernel" Of Spring
@@ -36,14 +36,19 @@ Spring Operating System
 
 - Object invocation Across The Network
 ![Object invocation Across The Network](ss/L06A-04.png)
+
 - Secure Object Invocation
 ![Secure Object Invocation](ss/L06A-05.png)
+
+![ Question] (ss/L06A-06.png)
+
 
 - Virtual Memory Management in Spring
 ![Virtual Memory Management in Spring](ss/L06A-07.png)
 
 - Memory Object Secific Paging
 ![Memory Object Secific Paging](ss/L06A-08.png)
+
 - Spring System Summary
 ![Spring System Summary](ss/L06A-09.png)
 
@@ -52,6 +57,7 @@ Spring Operating System
 
 - Subcontract
 ![Subcontract](ss/L06A-11.png)
+
 
 - Subcontract Interface for Stubs
 ![Subcontract Interface for Stubs](ss/L06A-12.png)
