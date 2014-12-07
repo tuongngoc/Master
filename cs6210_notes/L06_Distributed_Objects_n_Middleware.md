@@ -10,15 +10,18 @@ Spring Operating System
 ### Videos
 
 - How to innovate OS in the commercial space?
-	- In a commercial space, the choice becomes whether to build a new OS or to build a better implementation of an existing OS.
+	- In a commercial space, the choice becomes whether to build a new OS or to build a better implementation of an existing OS?
+	- The question becomes should we build a brand new OS or build a better implementation of a known OS?
+=> Marketplace demand says that, well, there are legacy applications that are running on your current operating system and therefore building a brand new operating system may not be that viable in an industrial setting.  So the approach they took in the Spring system at Sun Microsystems, is to be different but innovate where it makes sense.
+
 	- Due to the installed base of applications, moving to a new OS is not a teneable option. Sun, therefore too the latter approach with Spring.
 	- The space that Spring was intended for was large scale commercial applications - the staple for Sun's customer base. The OS therefore had to run existing applications unchanged and yet allow for them to be scaled to larger capacities via clusters.
 	- [2:57] Sun wanted to build a network OS during the time when the industry was moving to services provided on the network. So they wanted to build an OS that worked on one machine and more using the same Unix API.
 	- It also had to allow for 3rd party vendors being able to use the API exposed optimally without breaking anything.
 	- Ie, keep all the good things, but add innovation and flexiblity.
 	- OO is a good choice for this by keeping this "under the covers".
-- Procedural vs OO Design
-	![Procedural vs OO design](ss/vlcsnap-00001.png)
+- Object-based vs Procedural Design
+	![Object-based vs Procedural design](ss/L06A-01.png)
 	- Monolithic kernels are built with state strewn all over the subsystems that make up the kernel. With OO design, state is contained within objects and methods inside the object manipulate the state. Only the methods are visible externally.
 	- Thus you get strong interfaces and isloation of state.
 	- However, what about the border crossing cost? Ans TBD to later.
