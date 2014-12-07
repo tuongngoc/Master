@@ -39,8 +39,6 @@ Spring Operating System
 - Secure Object Invocation
 ![Secure Object Invocation](ss/L06A-05.png)
 
-![Question](ss/L06A-06.png)
-
 - Virtual Memory Management in Spring
 ![Virtual Memory Management in Spring](ss/L06A-07.png)
 
