@@ -37,8 +37,13 @@ Spring Operating System
 - Object invocation Across The Network
 ![Object invocation Across The Network](ss/L06A-04.png)
 
+
+
+
 - Secure Object Invocation
 ![Secure Object Invocation](ss/L06A-05.png)
+
+
 
 ![ Question] (ss/L06A-06.png)
 
@@ -55,11 +60,16 @@ Spring Operating System
 - Dynamic Client Server Releationship
 ![Dynamic Client Server Releationship](ss/L06A-10.png)
 
-- Subcontract
+*** Subcontact
+- The secret sauce that makes this dynamic relation between the client and the server possible is this mechanism called subcontract.
+- The IDL(Interface Description language) used to create the contract between the client and the server.
+- Subcontract is a mechanism to hide the runtime behavior of an object from the actual interface. For instance, there could be a singleton implementation of the server, or it could be a replicated implementation of the server.
 ![Subcontract](ss/L06A-11.png)
 
-
-- Subcontract Interface for Stubs
+*** Subcontract Interface for Stubs
+- The first interface, of course, is for marshaling and unmarshaling.
+-  when the client stub wants to marshal the arguments for a particular invocation, it just calls the subcontract and says please marshal these arguments for me, and the subcontract knows the way in which this particular invocation is going to be handled, and so it can then do the appropriate thing for marshaling the arguments based on where the location of the server is. 
+-  The client stub and the server stub don't have to do anything differently, whether the client and the server are in the same machine or in a different machine.
 ![Subcontract Interface for Stubs](ss/L06A-12.png)
 
 
