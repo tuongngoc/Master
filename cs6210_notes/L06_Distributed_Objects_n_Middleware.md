@@ -1,7 +1,8 @@
  L06 Distributed Objects and Middleware
 ======================================
-
-**LOTS OF GAPS IN SPRING SYSTEM VIDEOS AND PAPER. DO THIS AGAIN. STILL CANNOT ANSWER EXAM QN**
+1) Spring System	
+2) Distributed Object Model for Java	
+3) Enterprise Java Beans
 
 Spring Operating System
 -----------------------
