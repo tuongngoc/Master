@@ -38,18 +38,25 @@ Spring Operating System
 ![Object invocation Across The Network](ss/L06A-04.png)
 - Secure Object Invocation
 ![Secure Object Invocation](ss/L06A-05.png)
+
+![Question](ss/L06A-06.png)
+
 - Virtual Memory Management in Spring
-![Virtual Memory Management in Spring](ss/L06A-06.png)
+![Virtual Memory Management in Spring](ss/L06A-07.png)
+
 - Memory Object Secific Paging
-![Memory Object Secific Paging](ss/L06A-07.png)
+![Memory Object Secific Paging](ss/L06A-08.png)
 - Spring System Summary
-[Spring System Summary](ss/L06A-08.png)
+![Spring System Summary](ss/L06A-09.png)
+
 - Dynamic Client Server Releationship
-[Dynamic Client Server Releationship](ss/L06A-09.png)
+![Dynamic Client Server Releationship](ss/L06A-10.png)
+
 - Subcontract
-[Subcontract](ss/L06A-10.png)
+![Subcontract](ss/L06A-11.png)
+
 - Subcontract Interface for Stubs
-[Subcontract Interface for Stubs](ss/L06A-11.png)
+![Subcontract Interface for Stubs](ss/L06A-12.png)
 
 
 ### Papers
