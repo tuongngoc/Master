@@ -27,9 +27,29 @@ Spring Operating System
 	- However, what about the border crossing cost? Ans TBD to later.
 - Spring built kernel components using OO Technology.
 - Spring came out as Sun Solaris' MC product. See [Khalidi's paper](https://www.usenix.org/legacy/publications/library/proceedings/sd96/full_papers/khalidi.ps)
+
 - Spring Approach
 ![Spring system](ss/L06A-02.png)
+
+- Nucleus - "Micro Kernel" Of Spring
 ![Nucleus microkernel](ss/L06A-03.png)
+
+- Object invocation Across The Network
+![Object invocation Across The Network](ss/L06A-04.png)
+- Secure Object Invocation
+![Secure Object Invocation](ss/L06A-05.png)
+- Virtual Memory Management in Spring
+![Virtual Memory Management in Spring](ss/L06A-06.png)
+- Memory Object Secific Paging
+![Memory Object Secific Paging](ss/L06A-07.png)
+- Spring System Summary
+[Spring System Summary](ss/L06A-08.png)
+- Dynamic Client Server Releationship
+[Dynamic Client Server Releationship](ss/L06A-09.png)
+- Subcontract
+[Subcontract](ss/L06A-10.png)
+- Subcontract Interface for Stubs
+[Subcontract Interface for Stubs](ss/L06A-11.png)
 
 
 ### Papers
