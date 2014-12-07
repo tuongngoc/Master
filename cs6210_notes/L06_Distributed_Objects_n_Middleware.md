@@ -28,8 +28,8 @@ Spring Operating System
 - Spring built kernel components using OO Technology.
 - Spring came out as Sun Solaris' MC product. See [Khalidi's paper](https://www.usenix.org/legacy/publications/library/proceedings/sd96/full_papers/khalidi.ps)
 - Spring Approach
-![Spring system](ss/vlcsnap-00002.png)
-![Nucleus microkernel](ss/vlcsnap-00003.png)
+![Spring system](ss/L06A-02.png)
+![Nucleus microkernel](ss/L06A-03.png)
 
 
 ### Papers
