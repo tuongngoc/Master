@@ -1,8 +1,0 @@
-7
-http://google.com , 10646
-http://facebook.com , 43088
-http://youtube.com , 131934
-http://yahoo.com , 291783
-http://blogspot.com , 45561
-http://live.com , 9289
-http://twitter.com , 49647
